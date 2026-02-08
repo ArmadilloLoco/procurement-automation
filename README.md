@@ -42,7 +42,7 @@ POST /api/auth/login/ — вход (возвращает токен)
 GET /api/products/ — каталог товаров
 GET /api/products/{id}/` — детали товара
 ```
-# Заказы
+### Заказы
 ```
 POST /api/orders/ — создать заказ
 Тело: {
