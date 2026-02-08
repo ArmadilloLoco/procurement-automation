@@ -1,0 +1,38 @@
+supplier:
+  company_name: "ООО «Молочные Продукты»"
+  email: "milk@example.com"
+  accepts_orders: true
+
+products:
+  - name: "Молоко «Домик в деревне» 1л"
+    price: 98.50
+    description: "Пастеризованное молоко 3.2% жирности"
+    attributes:
+      - name: "Бренд"
+        value: "Домик в деревне"
+      - name: "Жирность"
+        value: "3.2%"
+      - name: "Объём"
+        value: "1 л"
+
+  - name: "Кефир «Простоквашино» 0.9л"
+    price: 89.90
+    description: "Кефир 2.5% жирности"
+    attributes:
+      - name: "Бренд"
+        value: "Простоквашино"
+      - name: "Жирность"
+        value: "2.5%"
+      - name: "Объём"
+        value: "0.9 л"
+
+  - name: "Сметана «Российская» 20%"
+    price: 75.00
+    description: "Сметана высокой жирности"
+    attributes:
+      - name: "Бренд"
+        value: "Российская"
+      - name: "Жирность"
+        value: "20%"
+      - name: "Вес"
+        value: "250 г"
