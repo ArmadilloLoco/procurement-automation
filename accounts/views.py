@@ -14,11 +14,18 @@ import uuid
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
+    """
+    Регистрация нового пользователя.
+    После успешной регистрации:
+    - создаётся токен аутентификации,
+    - отправляется приветственное письмо на email.
+    """
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
         token, _ = Token.objects.get_or_create(user=user)
-        
+
+        # Отправка email-подтверждения регистрации
         send_mail(
             subject="Добро пожаловать!",
             message="Вы успешно зарегистрировались в системе закупок.",
@@ -39,7 +46,10 @@ def register(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def password_reset_request(request):
-    """Запрос на сброс пароля: отправляет токен на email"""
+    """
+    Запрос на сброс пароля.
+    Генерирует временный токен и отправляет ссылку на email.
+    """
     email = request.data.get('email')
     if not email:
         return Response({'error': 'Email обязателен'}, status=status.HTTP_400_BAD_REQUEST)
@@ -49,7 +59,7 @@ def password_reset_request(request):
     except User.DoesNotExist:
         return Response({'detail': 'Если email зарегистрирован, вы получите инструкции.'}, status=status.HTTP_200_OK)
 
-    # Генерируем токен
+    # Генерация одноразового токена сброса пароля
     token = str(uuid.uuid4())
     user.password_reset_token = token
     user.password_reset_expires = timezone.now() + timedelta(hours=1)
@@ -57,7 +67,7 @@ def password_reset_request(request):
 
     reset_url = f"http://127.0.0.1:8000/api/auth/password-reset-confirm/?token={token}"
 
-    # Отправляем email
+    # Отправка инструкций по email
     send_mail(
         subject="Сброс пароля",
         message=f"Перейдите по ссылке для сброса пароля:\n{reset_url}\n\nСсылка действительна 1 час.",
@@ -72,7 +82,11 @@ def password_reset_request(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def password_reset_confirm(request):
-    """Подтверждение сброса: установка нового пароля по токену"""
+    """
+    Подтверждение сброса пароля.
+    Принимает токен и новый пароль, проверяет срок действия токена,
+    устанавливает новый пароль и очищает токен.
+    """
     token = request.data.get('token')
     new_password = request.data.get('new_password')
 
@@ -91,7 +105,7 @@ def password_reset_confirm(request):
         user.save()
         return Response({'error': 'Токен просрочен'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Устанавливаем новый пароль
+    # Установка нового пароля и очистка токена
     user.set_password(new_password)
     user.password_reset_token = None
     user.password_reset_expires = None

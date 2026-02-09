@@ -3,6 +3,11 @@ from accounts.models import User
 from products.models import Product
 
 class Order(models.Model):
+    """
+    Модель заказа.
+    Связана с клиентом (User), содержит адрес доставки, статус и дату создания.
+    Статус позволяет отслеживать этапы обработки заказа в системе.
+    """    
     STATUS_CHOICES = [
         ('pending', 'Ожидает подтверждения'),
         ('confirmed', 'Подтверждён'),
@@ -18,6 +23,11 @@ class Order(models.Model):
         return f"Заказ #{self.id} от {self.client.email}"
 
 class OrderItem(models.Model):
+    """
+    Промежуточная модель для связи заказа и товаров.
+    Позволяет одному заказу содержать несколько товаров в заданном количестве.
+    Поддерживает товары от разных поставщиков в одном заказе — требование ТЗ.
+    """    
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)

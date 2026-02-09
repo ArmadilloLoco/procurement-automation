@@ -9,31 +9,33 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+"""
+Django settings for procurement project.
 
+Основные особенности конфигурации:
+- Используется кастомная модель пользователя (accounts.User) с поддержкой ролей.
+- Аутентификация через TokenAuthentication (DRF).
+- Email отправляется в консоль (для разработки).
+- Безопасность: SECRET_KEY и DEBUG управляются через .env.
+"""
 from pathlib import Path
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent # Базовый путь проекта
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = 'django-insecure-(*xkk@tjnkx_rd7g&p^d736em76-v(j!vjin2u!up8)e2s*_8^'
+# Загрузка настроек из .env
 SECRET_KEY = config('SECRET_KEY', default='secret-key')
 DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -44,19 +46,18 @@ INSTALLED_APPS = [
 
     # 3rd party
     'rest_framework',
-    'rest_framework.authtoken', # JWT
+    'rest_framework.authtoken', # Аутентификация по токену
 
     # local
-    'accounts',
-    'products',
-    'orders',
+    'accounts',  # Пользователи: клиенты и поставщики
+    'products',  # Товары, поставщики, характеристики
+    'orders',    # Заказы
 ]
 
-# DRF settings
+# Настройки DRF: аутентификация по токену, доступ только для авторизованных
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-        # SessionAuthentication через браузер
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -96,7 +97,7 @@ WSGI_APPLICATION = 'procurement.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+# База данных SQLite
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -107,7 +108,7 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
+# Валидация паролей (включена по умолчанию)
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -126,28 +127,26 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
-
+# Локализация
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
-
 STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
+# Использовать BigAutoField по умолчанию
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Кастомная модель пользователя
 AUTH_USER_MODEL = 'accounts.User'
 
+# Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'noreply@procurement.local'
-ADMIN_EMAIL = 'admin@example.com'
+ADMIN_EMAIL = 'admin@example.com'  # Используется в send_admin_invoice()
